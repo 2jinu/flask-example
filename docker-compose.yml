@@ -1,0 +1,49 @@
+version: "3"
+services:
+  flask:
+    build:
+      context: ./flask
+      dockerfile: Dockerfile
+    image: flask
+    container_name: flask
+    restart: always
+    ports:
+      - 80:5000
+    depends_on:
+      - mariadb
+    volumes:
+      - ./flask/source:/source
+    environment:
+      - MARIADB_HOST=mariadb
+      - MARIADB_PORT=3306
+      - MARIADB_USER=user
+      - MARIADB_PASSWORD=user
+      - MARIADB_DATABASE=mydb
+    networks:
+      default:
+      internal:
+
+  mariadb:
+    image: mariadb:11.1.2-jammy
+    container_name: mariadb
+    restart: always
+    environment:
+      - MARIADB_USER=user
+      - MARIADB_PASSWORD=user
+      - MARIADB_DATABASE=mydb
+      - MARIADB_ROOT_PASSWORD=root
+      - TZ=Asia/Seoul
+    volumes:
+      - ./mariadb/conf.d:/etc/mysql/conf.d
+      - ./mariadb/data:/var/lib/mysql
+      - ./mariadb/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    ports:
+      - 3306:3306
+    networks:
+      default:
+      internal:
+
+networks:
+  default:
+  internal:
+    internal: true
