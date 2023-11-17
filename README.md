@@ -2,7 +2,7 @@
 
 Flask를 사용하여 웹 서비스를 빠르고 쉽게 구축하고 경험할 수 있는 예제 프로젝트를 제공합니다.
 
-<img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Flask_logo.svg">
+<img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Flask_logo.svg" style="width: 100%">
 
 ## Install
 
