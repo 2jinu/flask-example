@@ -37,10 +37,7 @@ services:
       - ./mariadb/conf.d:/etc/mysql/conf.d
       - ./mariadb/data:/var/lib/mysql
       - ./mariadb/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
-    ports:
-      - 3306:3306
     networks:
-      default:
       internal:
 
 networks:
