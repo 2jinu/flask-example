@@ -50,6 +50,7 @@ def register():
         db.session.add(instance=user)
         try:
             db.session.commit()
+            login_user(user=user)
             return redirect(location=url_for(endpoint="board.main"))
         
         except IntegrityError as e:

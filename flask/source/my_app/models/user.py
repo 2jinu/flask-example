@@ -2,7 +2,7 @@ import re
 from flask import abort
 from flask_wtf import FlaskForm
 from flask_login import UserMixin, current_user
-from wtforms import StringField, PasswordField, SelectField, SubmitField
+from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Length, EqualTo, ValidationError
 from sqlalchemy import Column, ForeignKey
 from sqlalchemy.orm import relationship, backref
@@ -78,7 +78,6 @@ class RegistrationForm(FlaskForm):
         label="회원가입",
         render_kw={"id": "registerSubmit"}
     )
-    # role = SelectField(label="역할", choices=[("USER", "사용자"), ("ADMIN", "관리자")], default="USER", validators=[DataRequired()])
 
 class Role(db.Model):
     __tablename__ = "roles"

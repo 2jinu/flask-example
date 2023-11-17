@@ -2,6 +2,7 @@ from flask import Blueprint, request, render_template, redirect, url_for, flash
 from flask_login import login_required, current_user
 
 from my_app import db
+from my_app.models.user import role_required
 from my_app.models.post import Post, WriteForm
 
 PER_PAGE = 10
@@ -56,6 +57,7 @@ def view(post_id:int):
 
 @bp_board.route(rule="/write/", methods=["GET", "POST"])
 @login_required
+@role_required(roles=["ADMIN"])
 def write():
     form = WriteForm()
     if request.method == "GET":
