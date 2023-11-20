@@ -10,7 +10,7 @@ from sqlalchemy.dialects.mysql import INTEGER, VARCHAR
 from functools import wraps
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from my_app import db, lm
+from my_app import db, lm, app
 
 class UsernameFilter:
     def __init__(self, banned:list, regex:str, message=None):
@@ -95,7 +95,7 @@ class Role(db.Model):
     )
 
     def __repr__(self):
-        return f"Role(name={self.name})"
+        return f"Role(name='{self.name}')"
 
 class User(db.Model, UserMixin):
     __tablename__ = "users"
@@ -132,6 +132,12 @@ class User(db.Model, UserMixin):
 
     def check_password(self, password:str):
         return check_password_hash(self.password, password)
+    
+    def serialize(self):
+        user_info = {c.name: getattr(self, c.name) for c in self.__table__.columns if not c.name == "password"}
+        role_info = [role.name for role in self.roles]
+        user_info["roles"] = role_info
+        return user_info
 
 class UserRoles(db.Model):
     __tablename__ = 'user_roles'

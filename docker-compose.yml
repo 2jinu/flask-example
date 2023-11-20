@@ -40,6 +40,15 @@ services:
     networks:
       internal:
 
+  redis:
+    image: redis:7.0
+    restart: always
+    container_name: redis
+    volumes:
+      - ./redis/data:/data
+    networks:
+      internal:
+
 networks:
   default:
   internal:
