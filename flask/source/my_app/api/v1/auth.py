@@ -51,7 +51,7 @@ class Token(Resource):
             refresh_token   = create_refresh_token(identity=user.id)
             return make_response(jsonify(access_token=access_token, refresh_token=refresh_token), 201)
 
-        return make_response(jsonify(message="Unauthorized"), 401)# {"message": "Unauthorized"}, 401
+        return make_response(jsonify(msg="Unauthorized"), 401)
     
     @auth_namespace.doc(description="""인증 토큰을 갱신하는 API입니다.""")
     @auth_namespace.expect(refresh_parser, validation=True)
@@ -89,7 +89,7 @@ class Users(Resource):
     def get(self):
         """사용자 조회"""
 
-        users = User.query.all()
-        users = [user.serialize() for user in users]
-        app.logger.error(users)
-        return make_response(dumps(obj=users, ensure_ascii=False, indent=4), 200)
+        user = User.query.get(ident=get_jwt_identity())
+        user = user.serialize()
+        app.logger.error(user)
+        return make_response(dumps(obj=user, ensure_ascii=False, indent=4), 200)

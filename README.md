@@ -1,8 +1,19 @@
 # flask-example
 
+<img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Flask_logo.svg" style="width: 100%">
+
 Flask를 사용하여 웹 서비스를 빠르고 쉽게 구축하고 경험할 수 있는 예제 프로젝트를 제공합니다.
 
-<img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Flask_logo.svg" style="width: 100%">
+| Example               | Description   |
+| :---                  | :---          |
+| Flask                 | 웹 애플리케이션을 쉽고 빠르게 개발 |
+| Flask-WTF             | Flask와 함께 사용되는 폼(Form) 처리를 위한 라이브러리 |
+| Flask-SQLAlchemy      | 데이터베이스 액세스 툴킷 및 ORM 라이브러리 |
+| Flask-Login           | 사용자 인증 및 세션 관리를 쉽게 구현할 수 있도록 도와주는 라이브러리 |
+| Flask-JWT-Extended    | JWT(JSON Web Tokens)을 구현하고 관리하는 데 사용되는 라이브러리 |
+| Flask-RESTx           | RESTful API를 쉽게 개발할 수 있도록 도와주는 라이브러리 |
+| Flask-Caching         | 간단하고 유연한 캐싱 기능을 제공하는 라이브러리 |
+| redis                 | 메모리 기반의 데이터 저장소로서 사용되는 오픈 소스 기반의 NoSQL 데이터베이스 |
 
 ## Install
 
