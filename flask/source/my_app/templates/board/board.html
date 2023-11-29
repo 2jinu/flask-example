@@ -14,6 +14,7 @@
                     <th class="text-center align-middle col-1" scope="col">번호</th>
                     <th class="text-center align-middle col-auto" scope="col">제목</th>
                     <th class="text-center align-middle col-1" scope="col">글쓴이</th>
+                    <th class="text-center align-middle col-1" scope="col">조회수</th>
                     <th class="text-center align-middle col-2" scope="col">등록일시</th>
                 </tr>
             </thead>
@@ -25,10 +26,13 @@
                         {{ post.id }}
                     </td>
                     <td class="text-start align-middle text-truncate" style="max-width: 150px;">
-                        <a href="{{ url_for('board.view', post_id=post.id) }}">{{ post.title }}</a>
+                        <a href="{{ url_for('board.view', id=post.id) }}">{{ post.title }}</a>
                     </td>
                     <td class="text-center align-middle">
                         {{ post.user.username }}
+                    </td>
+                    <td class="text-center align-middle">
+                        {{ post.view_count }}
                     </td>
                     <td class="text-center align-middle">
                         {{ post.created }}

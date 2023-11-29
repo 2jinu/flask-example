@@ -3,7 +3,7 @@ from flask import make_response, jsonify
 from flask_restx import Namespace, Resource, reqparse, fields
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity, get_jwt
 
-from my_app import rc, app
+from my_app import rc
 from my_app.models.user import User
 
 auth_namespace = Namespace(name="auth", description="인증 API")
@@ -91,5 +91,4 @@ class Users(Resource):
 
         user = User.query.get(ident=get_jwt_identity())
         user = user.serialize()
-        app.logger.error(user)
         return make_response(dumps(obj=user, ensure_ascii=False, indent=4), 200)

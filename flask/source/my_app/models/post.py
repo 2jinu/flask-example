@@ -32,6 +32,12 @@ class Post(db.Model):
         default=func.now(),
         comment="게시글 작성 일시"
     )
+    view_count = Column(
+        INTEGER(display_width=11, unsigned=True),
+        nullable=False,
+        default=0,
+        comment="게시글 조회수"
+    )
     user = relationship(
         argument="User",
         secondary="user_posts",
@@ -40,8 +46,13 @@ class Post(db.Model):
     )
     files = relationship(
         argument="File",
-        secondary="file_posts",
+        secondary="post_files",
         backref=backref(name="posts", lazy="dynamic"),
+        uselist=True
+    )
+    views = relationship(
+        argument="PostViews",
+        backref=backref(name="posts"),
         uselist=True
     )
 
@@ -52,7 +63,7 @@ class Post(db.Model):
         self.files = files
 
     def __repr__(self):
-        return f"Post(id={self.id}, title={self.title}, created={self.created}, user={self.user}, file={self.files})"
+        return f"Post(id={self.id}, title={self.title}, created={self.created}, user={self.user}, files={self.files}, views={self.views})"
     
 class File(db.Model):
     __tablename__ = "files"
@@ -80,9 +91,8 @@ class File(db.Model):
     def __repr__(self) -> str:
         return f"File(id={self.id}, original_name={self.original_name}, stored_name={self.stored_name})"
 
-    
 class UserPosts(db.Model):
-    __tablename__ = 'user_posts'
+    __tablename__ = "user_posts"
     id = Column(
         INTEGER(display_width=11, unsigned=True),
         primary_key=True,
@@ -102,8 +112,8 @@ class UserPosts(db.Model):
         comment="게시글 식별 값"
     )
 
-class FilePosts(db.Model):
-    __tablename__ = 'file_posts'
+class PostFiles(db.Model):
+    __tablename__ = "post_files"
     id = Column(
         INTEGER(display_width=11, unsigned=True),
         primary_key=True,
@@ -121,4 +131,25 @@ class FilePosts(db.Model):
         ForeignKey(column="files.id", ondelete="CASCADE"),
         nullable=False,
         comment="첨부파일 식별 값"
+    )
+
+class PostViews(db.Model):
+    __tablename__ = "post_views"
+    id = Column(
+        INTEGER(display_width=11, unsigned=True),
+        primary_key=True,
+        autoincrement="auto",
+        comment="게시글 조회 매핑 식별 값"
+    )
+    post_id = Column(
+        INTEGER(display_width=11, unsigned=True),
+        ForeignKey(column="posts.id", ondelete="CASCADE"),
+        nullable=False,
+        comment="게시글 식별 값"
+    )
+    user_id = Column(
+        INTEGER(display_width=11, unsigned=True),
+        ForeignKey(column="users.id"),
+        nullable=False,
+        comment="사용자 식별 값"
     )

@@ -4,7 +4,7 @@ from flask_login import login_required, current_user
 
 from my_app import db, app
 from my_app.models.user import role_required
-from my_app.models.post import Post, File
+from my_app.models.post import Post, File, PostViews
 from my_app.forms.post import WriteForm
 
 PER_PAGE = 10
@@ -50,7 +50,7 @@ def main():
 
 @bp_board.route(rule="/write/", methods=["GET", "POST"])
 @login_required
-@role_required(roles=["ADMIN"])
+@role_required(roles=["ADMIN", "USER"])
 def write():
     form = WriteForm()
     if request.method == "GET":
@@ -81,10 +81,15 @@ def write():
 
     return redirect(location=url_for(endpoint="board.main"))
 
-@bp_board.route(rule="/<int:post_id>/", methods=["GET"])
+@bp_board.route(rule="/<int:id>/", methods=["GET"])
 @login_required
-def view(post_id:int):
-    post = Post.query.get(ident=post_id)
+def view(id:int):
+    post = Post.query.get(ident=id)
+    if not PostViews.query.filter_by(post_id=id, user_id=current_user.id).first() and post.user.id != current_user.id:
+        post.views.append(PostViews(user_id=current_user.id))
+        post.view_count = len(post.views)
+        db.session.commit()
+
     return render_template(
         template_name_or_list="board/view.html",
         post=post

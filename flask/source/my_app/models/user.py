@@ -8,24 +8,6 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from my_app import db
 
-class Role(db.Model):
-    __tablename__ = "roles"
-    id = Column(
-        INTEGER(display_width=11, unsigned=True),
-        primary_key=True,
-        autoincrement="auto",
-        comment="역할 식별 값"
-    )
-    name = Column(
-        VARCHAR(length=10),
-        unique=True,
-        nullable=False,
-        comment="역할"
-    )
-
-    def __repr__(self):
-        return f"Role(name='{self.name}')"
-
 class User(db.Model, UserMixin):
     __tablename__ = "users"
     id = Column(
@@ -48,7 +30,8 @@ class User(db.Model, UserMixin):
     roles = relationship(
         argument="Role",
         secondary="user_roles",
-        backref=backref(name="users", lazy=True)
+        backref=backref(name="users", lazy=True),
+        uselist=True
     )
 
     def __init__(self, username:str, password:str, roles:list):
@@ -68,8 +51,26 @@ class User(db.Model, UserMixin):
         user_info["roles"] = role_info
         return user_info
 
+class Role(db.Model):
+    __tablename__ = "roles"
+    id = Column(
+        INTEGER(display_width=11, unsigned=True),
+        primary_key=True,
+        autoincrement="auto",
+        comment="역할 식별 값"
+    )
+    name = Column(
+        VARCHAR(length=10),
+        unique=True,
+        nullable=False,
+        comment="역할"
+    )
+
+    def __repr__(self):
+        return f"Role(name='{self.name}')"
+    
 class UserRoles(db.Model):
-    __tablename__ = 'user_roles'
+    __tablename__ = "user_roles"
     id = Column(
         INTEGER(display_width=11, unsigned=True),
         primary_key=True,
