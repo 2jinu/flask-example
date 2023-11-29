@@ -6,7 +6,7 @@ from sqlalchemy.dialects.mysql import INTEGER, VARCHAR
 from functools import wraps
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from my_app import db
+from my_app import db, lm
 
 class User(db.Model, UserMixin):
     __tablename__ = "users"
@@ -29,7 +29,7 @@ class User(db.Model, UserMixin):
     )
     roles = relationship(
         argument="Role",
-        secondary="user_roles",
+        secondary="rel_user_roles",
         backref=backref(name="users", lazy=True),
         uselist=True
     )
@@ -70,7 +70,7 @@ class Role(db.Model):
         return f"Role(name='{self.name}')"
     
 class UserRoles(db.Model):
-    __tablename__ = "user_roles"
+    __tablename__ = "rel_user_roles"
     id = Column(
         INTEGER(display_width=11, unsigned=True),
         primary_key=True,
@@ -89,6 +89,10 @@ class UserRoles(db.Model):
         nullable=False,
         comment="역할 식별 값"
     )
+
+@lm.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 def role_required(roles:list):
     def decorator(f):

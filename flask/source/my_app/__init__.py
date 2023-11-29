@@ -25,17 +25,11 @@ def create_app():
         app.register_blueprint(blueprint=bp_api)
 
         db.init_app(app=app)
-        from my_app.models.user import User
-        from my_app.models.post import Post
         db.create_all()
 
         lm.login_view       = "index.login"
         lm.login_message    = "로그인이 필요합니다."
         lm.init_app(app=app)
-
-        @lm.user_loader
-        def load_user(user_id):
-            return User.query.get(int(user_id))
 
         jwt.init_app(app=app)
         

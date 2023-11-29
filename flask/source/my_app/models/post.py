@@ -40,13 +40,13 @@ class Post(db.Model):
     )
     user = relationship(
         argument="User",
-        secondary="user_posts",
+        secondary="rel_user_posts",
         backref=backref(name="posts", lazy="dynamic"),
         uselist=False
     )
     files = relationship(
         argument="File",
-        secondary="post_files",
+        secondary="rel_post_files",
         backref=backref(name="posts", lazy="dynamic"),
         uselist=True
     )
@@ -92,7 +92,7 @@ class File(db.Model):
         return f"File(id={self.id}, original_name={self.original_name}, stored_name={self.stored_name})"
 
 class UserPosts(db.Model):
-    __tablename__ = "user_posts"
+    __tablename__ = "rel_user_posts"
     id = Column(
         INTEGER(display_width=11, unsigned=True),
         primary_key=True,
@@ -113,7 +113,7 @@ class UserPosts(db.Model):
     )
 
 class PostFiles(db.Model):
-    __tablename__ = "post_files"
+    __tablename__ = "rel_post_files"
     id = Column(
         INTEGER(display_width=11, unsigned=True),
         primary_key=True,
@@ -134,7 +134,7 @@ class PostFiles(db.Model):
     )
 
 class PostViews(db.Model):
-    __tablename__ = "post_views"
+    __tablename__ = "rel_post_views"
     id = Column(
         INTEGER(display_width=11, unsigned=True),
         primary_key=True,

@@ -81,11 +81,11 @@ def write():
 
     return redirect(location=url_for(endpoint="board.main"))
 
-@bp_board.route(rule="/<int:id>/", methods=["GET"])
+@bp_board.route(rule="/<int:post_id>/", methods=["GET"])
 @login_required
-def view(id:int):
-    post = Post.query.get(ident=id)
-    if not PostViews.query.filter_by(post_id=id, user_id=current_user.id).first() and post.user.id != current_user.id:
+def view(post_id:int):
+    post = Post.query.get(ident=post_id)
+    if not PostViews.query.filter_by(post_id=post_id, user_id=current_user.id).first() and post.user.id != current_user.id:
         post.views.append(PostViews(user_id=current_user.id))
         post.view_count = len(post.views)
         db.session.commit()
@@ -95,9 +95,9 @@ def view(id:int):
         post=post
     )
 
-@bp_board.route(rule="/download/<string:file_id>", methods=["GET"])
+@bp_board.route(rule="/<int:post_id>/files/<string:file_id>", methods=["GET"])
 @login_required
-def download(file_id:int):
+def download(post_id:int, file_id:int):
     file = File.query.get(ident=file_id)
     if file:
         upload_dir = os.path.join(app.static_folder, "upload")
