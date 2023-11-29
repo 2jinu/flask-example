@@ -5,20 +5,30 @@
 <div class="container-fluid">
     {% include "nav.html" %}
 
-    <form action="{{ url_for('board.write') }}" method="post" class="w-100">
-        {{ form.hidden_tag() }}
-        <div class="form-group mb-3">
-            {{ form.title.label(class="fw-bold") }}
-            {{ form.title(class="form-control border-secondary") }}
-        </div>
-        <div class="form-group mb-3">
-            {{ form.content.label(class="fw-bold") }}
-            {{ form.content(class="form-control border-secondary") }}
-        </div>
-        <div class="form-group row m-0">
-            {{ form.submit(class="btn btn-primary") }}
-        </div>
-    </form>
+    <div class="container py-3">
+        <form action="{{ url_for('board.write') }}" method="post" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+
+            <div class="form-group mb-3">
+                {{ form.title.label(class="fw-bold") }}
+                {{ form.title(class="form-control border-secondary") }}
+            </div>
+
+            <div class="form-group mb-3">
+                {{ form.content.label(class="fw-bold") }}
+                {{ form.content(class="form-control border-secondary") }}
+            </div>
+
+            <div class="form-group mb-3">
+                {{ form.attachments.label(class="fw-bold") }}
+                {{ form.attachments(class="form-control border-secondary") }}
+            </div>
+            
+            <div class="form-group row m-0">
+                {{ form.submit(class="btn btn-primary") }}
+            </div>
+        </form>
+    </div>
 </div>
 
 {% endblock %}

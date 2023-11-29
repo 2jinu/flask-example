@@ -15,8 +15,8 @@
                 <div class="container">
                     <div class="row">
                         <div class="col-md-9 col-lg-8 mx-auto">
-                            <h3 class="login-heading mb-4">어서오세요!</h3>
-                            <form action="{{ url_for('index.login') }}" method="post">
+                            <h3 class="login-heading mb-4">환영합니다!</h3>
+                            <form action="{{ url_for('index.regist')}}" method="post">
                                 {{ form.hidden_tag() }}
                                 <div class="form-label-group position-relative mb-3">
                                     {{ form.username(class="form-control") }}
@@ -24,18 +24,20 @@
                                 </div>
                 
                                 <div class="form-label-group position-relative mb-3">
-                                    <div class="input-group">
-                                        {{ form.password(class="form-control") }}
-                                        {{ form.password.label(for="password") }}
-                                        <span class="input-group-text" style="width: 46px;">
-                                            <i class="fa-regular fa-eye cursor password-toggle"></i>
-                                        </span>
-                                    </div>
+                                    {{ form.password(class="form-control") }}
+                                    {{ form.password.label(for="password") }}
                                 </div>
-                                
+
+                                <div class="form-label-group position-relative">
+                                    {{ form.password_confirm(class="form-control") }}
+                                    {{ form.password_confirm.label(for="password_confirm") }}
+                                </div>
+
+                                <p style="height: 24px;"><em><small id="password-message"></small></em></p>
+
                                 <div class="d-flex justify-content-between align-items-center">
                                     {{ form.submit(class="btn btn-lg btn-primary text-uppercase font-weight-bold") }}
-                                    <a href="{{ url_for('index.regist') }}">회원가입</a>
+                                    <a href="{{ url_for('index.login') }}">로그인</a>
                                 </div>
                             </form>
                         </div>
@@ -47,18 +49,19 @@
 </div>
 
 <script>
-    const passwordField = $("#password");
-    const passwordToggle = $(".password-toggle");
-
-    passwordToggle.on("click", function() {
-        if (passwordField.prop("type") == "password") {
-            passwordField.prop("type", "text");
-            passwordToggle.removeClass("fa-eye");
-            passwordToggle.addClass("fa-eye-slash");
+    const submitBtn = $('#submit');
+    const passwordMessage = $('#password-message');
+    $('#password, #password_confirm').on('keyup', function () {
+        if ($('#password').val() != $('#password_confirm').val()) {
+            passwordMessage.html('비밀번호가 일치하지 않습니다.').css('color', 'red');
+            submitBtn.prop('disabled', true);
+            submitBtn.removeClass("btn-primary");
+            submitBtn.addClass("btn-danger");
         } else {
-            passwordField.prop("type", "password");
-            passwordToggle.removeClass("fa-eye-slash");
-            passwordToggle.addClass("fa-eye");
+            passwordMessage.html('').css('color', 'green');
+            submitBtn.prop('disabled', false);
+            submitBtn.removeClass("btn-danger");
+            submitBtn.addClass("btn-primary");
         }
     });
 </script>

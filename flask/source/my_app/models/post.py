@@ -1,30 +1,12 @@
-from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, SubmitField
-from wtforms.validators import DataRequired, Length
 from sqlalchemy import Column, ForeignKey
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.dialects.mysql import INTEGER, VARCHAR, TEXT, DATETIME
+from werkzeug.utils import secure_filename
+from hashlib import sha3_256
+from datetime import datetime
 
 from my_app import db
-
-class WriteForm(FlaskForm):
-    title = StringField(
-        label="제목",
-        validators=[
-            DataRequired(message="제목을 입력하세요."),
-            Length(min=1, max=255, message="제목은 1자 이상, 255자 이하여야 합니다.")
-        ]
-    )
-    content = TextAreaField(
-        label="내용",
-        validators=[
-            DataRequired(message="내용을 입력하세요.")
-        ]
-    )
-    submit = SubmitField(
-        label="작성"
-    )
 
 class Post(db.Model):
     __tablename__ = "posts"
@@ -56,14 +38,48 @@ class Post(db.Model):
         backref=backref(name="posts", lazy="dynamic"),
         uselist=False
     )
+    files = relationship(
+        argument="File",
+        secondary="file_posts",
+        backref=backref(name="posts", lazy="dynamic"),
+        uselist=True
+    )
 
-    def __init__(self, title:str, content:str, user:list):
+    def __init__(self, title:str, content:str, user, files):
         self.title = title
         self.content = content
         self.user = user
+        self.files = files
 
     def __repr__(self):
-        return f"Post(id='{self.id}', title='{self.title}', created={self.created}, user={self.user})"
+        return f"Post(id={self.id}, title={self.title}, created={self.created}, user={self.user}, file={self.files})"
+    
+class File(db.Model):
+    __tablename__ = "files"
+    id = Column(
+        INTEGER(display_width=11, unsigned=True),
+        primary_key=True,
+        autoincrement="auto",
+        comment="파일 식별 값"
+    )
+    original_name = Column(
+        VARCHAR(length=255),
+        nullable=False,
+        comment="원본 파일 이름"
+    )
+    stored_name = Column(
+        VARCHAR(length=255),
+        nullable=False,
+        comment="저장 파일 이름"
+    )
+
+    def __init__(self, original_name:str):
+        self.original_name = secure_filename(filename=original_name)
+        self.stored_name = sha3_256(f"{datetime.now()}{self.original_name}".encode()).hexdigest()
+    
+    def __repr__(self) -> str:
+        return f"File(id={self.id}, original_name={self.original_name}, stored_name={self.stored_name})"
+
     
 class UserPosts(db.Model):
     __tablename__ = 'user_posts'
@@ -76,10 +92,33 @@ class UserPosts(db.Model):
     user_id = Column(
         INTEGER(display_width=11, unsigned=True),
         ForeignKey(column="users.id", ondelete="CASCADE"),
+        nullable=False,
         comment="사용자 식별 값"
     )
     post_id = Column(
         INTEGER(display_width=11, unsigned=True),
         ForeignKey(column="posts.id", ondelete="CASCADE"),
+        nullable=False,
         comment="게시글 식별 값"
+    )
+
+class FilePosts(db.Model):
+    __tablename__ = 'file_posts'
+    id = Column(
+        INTEGER(display_width=11, unsigned=True),
+        primary_key=True,
+        autoincrement="auto",
+        comment="게시글 첨부파일 매핑 식별 값"
+    )
+    post_id = Column(
+        INTEGER(display_width=11, unsigned=True),
+        ForeignKey(column="posts.id", ondelete="CASCADE"),
+        nullable=False,
+        comment="게시글 식별 값"
+    )
+    file_id = Column(
+        INTEGER(display_width=11, unsigned=True),
+        ForeignKey(column="files.id", ondelete="CASCADE"),
+        nullable=False,
+        comment="첨부파일 식별 값"
     )

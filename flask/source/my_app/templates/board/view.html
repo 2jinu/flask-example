@@ -12,6 +12,10 @@
 
     <p>{{ post.title }}</p>
 
+    {% for file in post.files %}
+        <a href="{{ url_for('board.download', file_id=file.id) }}">{{ file.original_name }}</a>
+    {% endfor %}
+
     <pre>{{ post.content }}</pre>
     {% endif %}
 </div>

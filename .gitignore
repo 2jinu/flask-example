@@ -1,3 +1,4 @@
+flask/source/my_app/static/upload
 mariadb/data/*
 *.pyc
 *.rdb
