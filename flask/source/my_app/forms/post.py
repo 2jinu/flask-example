@@ -13,9 +13,9 @@ class WriteForm(FlaskForm):
     )
     content = TextAreaField(
         label="내용",
-        validators=[
-            DataRequired(message="내용을 입력하세요.")
-        ]
+        # validators=[
+        #     DataRequired(message="내용을 입력하세요.")
+        # ]
     )
     attachments = MultipleFileField(
         label="첨부파일"

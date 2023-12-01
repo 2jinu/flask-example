@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
 	password VARCHAR(255) NOT NULL COMMENT '사용자 비밀번호'
 );
 
-CREATE TABLE IF NOT EXISTS user_roles (
+CREATE TABLE IF NOT EXISTS rel_user_roles (
     id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY COMMENT '사용자 역할 매핑 식별 값',
     user_id INT(11) UNSIGNED COMMENT '사용자 식별 값',
     role_id INT(11) UNSIGNED COMMENT '역할 식별 값',

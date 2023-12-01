@@ -20,17 +20,17 @@
                                 {{ form.hidden_tag() }}
                                 <div class="form-label-group position-relative mb-3">
                                     {{ form.username(class="form-control") }}
-                                    {{ form.username.label(for="username") }}
+                                    {{ form.username.label }}
                                 </div>
                 
                                 <div class="form-label-group position-relative mb-3">
                                     {{ form.password(class="form-control") }}
-                                    {{ form.password.label(for="password") }}
+                                    {{ form.password.label }}
                                 </div>
 
                                 <div class="form-label-group position-relative">
                                     {{ form.password_confirm(class="form-control") }}
-                                    {{ form.password_confirm.label(for="password_confirm") }}
+                                    {{ form.password_confirm.label }}
                                 </div>
 
                                 <p style="height: 24px;"><em><small id="password-message"></small></em></p>
@@ -49,10 +49,10 @@
 </div>
 
 <script>
-    const submitBtn = $('#submit');
+    const submitBtn = $("#{{ form.submit.id }}");
     const passwordMessage = $('#password-message');
-    $('#password, #password_confirm').on('keyup', function () {
-        if ($('#password').val() != $('#password_confirm').val()) {
+    $('#{{ form.password.id }}, #{{ form.password_confirm.id }}').on('keyup', function () {
+        if ($("#{{ form.password.id }}").val() != $("#{{ form.password_confirm.id }}").val()) {
             passwordMessage.html('비밀번호가 일치하지 않습니다.').css('color', 'red');
             submitBtn.prop('disabled', true);
             submitBtn.removeClass("btn-primary");

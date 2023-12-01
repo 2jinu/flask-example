@@ -1,7 +1,7 @@
 from sqlalchemy import Column, ForeignKey
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship, backref
-from sqlalchemy.dialects.mysql import INTEGER, VARCHAR, TEXT, DATETIME
+from sqlalchemy.dialects.mysql import INTEGER, VARCHAR, TEXT, DATETIME, LONGTEXT
 from werkzeug.utils import secure_filename
 from hashlib import sha3_256
 from datetime import datetime
@@ -22,7 +22,7 @@ class Post(db.Model):
         comment="게시글 제목"
     )
     content = Column(
-        TEXT(),
+        LONGTEXT(),
         nullable=False,
         comment="게시글 내용"
     )

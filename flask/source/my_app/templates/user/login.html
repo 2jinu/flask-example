@@ -20,13 +20,13 @@
                                 {{ form.hidden_tag() }}
                                 <div class="form-label-group position-relative mb-3">
                                     {{ form.username(class="form-control") }}
-                                    {{ form.username.label(for="username") }}
+                                    {{ form.username.label }}
                                 </div>
                 
                                 <div class="form-label-group position-relative mb-3">
                                     <div class="input-group">
                                         {{ form.password(class="form-control") }}
-                                        {{ form.password.label(for="password") }}
+                                        {{ form.password.label }}
                                         <span class="input-group-text" style="width: 46px;">
                                             <i class="fa-regular fa-eye cursor password-toggle"></i>
                                         </span>
@@ -47,7 +47,7 @@
 </div>
 
 <script>
-    const passwordField = $("#password");
+    const passwordField = $("#{{ form.password.id }}");
     const passwordToggle = $(".password-toggle");
 
     passwordToggle.on("click", function() {

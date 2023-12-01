@@ -2,22 +2,28 @@
 
 {% block content %}
 
+<link rel="stylesheet" href="{{ url_for('static', filename='css/ckeditor/content-styles.css') }}">
+
 <div class="container-fluid">
     {% include "nav.html" %}
 
-    {% if post %}
-    <p>{{ post.user.username }}</p>
+    <div class="container py-3">
+        {% if post %}
+        <p>{{ post.user.username }}</p>
 
-    <p>{{ post.created }}</p>
+        <p>{{ post.created }}</p>
 
-    <p>{{ post.title }}</p>
+        <p>{{ post.title }}</p>
 
-    {% for file in post.files %}
-        <a href="{{ url_for('board.download', post_id=post.id, file_id=file.id) }}">{{ file.original_name }}</a>
-    {% endfor %}
+        {% for file in post.files %}
+            <a href="{{ url_for('board.download', post_id=post.id, file_id=file.id) }}">{{ file.original_name }}</a>
+        {% endfor %}
 
-    <pre>{{ post.content }}</pre>
-    {% endif %}
+        <div class="ck-content">
+            {{ post.content | safe }}
+        </div>
+        {% endif %}
+    </div>
 </div>
 
 {% endblock %}

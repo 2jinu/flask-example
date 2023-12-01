@@ -48,7 +48,7 @@ class RegistrationForm(FlaskForm):
             Length(min=4, max=10, message="아이디는 4자 이상, 15자 이하여야 합니다."),
             UsernameFilter(banned=["admin"], regex=r"^[a-z0-9_]*$")
         ],
-        render_kw={"id": "registerUsername", "autofocus": True, "placeholder": ""}
+        render_kw={"autofocus": True, "placeholder": ""}
     )
     password = PasswordField(
         label="비밀번호",

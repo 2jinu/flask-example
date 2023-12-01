@@ -6,7 +6,7 @@ from sqlalchemy.dialects.mysql import INTEGER, VARCHAR
 from functools import wraps
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from my_app import db, lm
+from my_app import db, lm, app
 
 class User(db.Model, UserMixin):
     __tablename__ = "users"
