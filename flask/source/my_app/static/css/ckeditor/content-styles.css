@@ -21,7 +21,6 @@
     --ck-inline-image-style-spacing: calc(var(--ck-image-style-spacing) / 2);
     --ck-todo-list-checkmark-size: 16px;
 }
-
 /* @ckeditor/ckeditor5-table/theme/tablecolumnresize.css */
 .ck-content .table .ck-table-resized {
     table-layout: fixed;

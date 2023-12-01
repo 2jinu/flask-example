@@ -1,9 +1,10 @@
 from sqlalchemy import Column, ForeignKey
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship, backref
-from sqlalchemy.dialects.mysql import INTEGER, VARCHAR, TEXT, DATETIME, LONGTEXT
+from sqlalchemy.dialects.mysql import INTEGER, VARCHAR, DATETIME, LONGTEXT, CHAR
+from werkzeug.datastructures.file_storage import FileStorage
 from werkzeug.utils import secure_filename
-from hashlib import sha3_256
+from hashlib import sha3_256, sha256
 from datetime import datetime
 
 from my_app import db
@@ -83,13 +84,25 @@ class File(db.Model):
         nullable=False,
         comment="저장 파일 이름"
     )
+    size = Column(
+        INTEGER(display_width=11, unsigned=True),
+        nullable=False,
+        comment="파일 크기 (KB)"
+    )
+    hash = Column(
+        CHAR(length=128),
+        nullable=False,
+        comment="파일 해시(SHA-256)"
+    )
 
-    def __init__(self, original_name:str):
-        self.original_name = secure_filename(filename=original_name)
+    def __init__(self, file:FileStorage):
+        self.original_name = secure_filename(filename=file.filename)
         self.stored_name = sha3_256(f"{datetime.now()}{self.original_name}".encode()).hexdigest()
+        self.size = int(len(file.read()) / 1024)
+        self.hash = sha256(string=file.read()).hexdigest()
     
     def __repr__(self) -> str:
-        return f"File(id={self.id}, original_name={self.original_name}, stored_name={self.stored_name})"
+        return f"File(id={self.id}, original_name={self.original_name}, stored_name={self.stored_name}, size={self.size}, hash={self.hash})"
 
 class UserPosts(db.Model):
     __tablename__ = "rel_user_posts"

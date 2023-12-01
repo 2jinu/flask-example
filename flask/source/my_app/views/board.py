@@ -41,11 +41,15 @@ def main():
     if end_page == 0:
         end_page = 1
 
+    views = PostViews.query.filter_by(user_id=current_user.id).all()
+    views = [view.post_id for view in views]
+
     return render_template(
         template_name_or_list="board/board.html",
         start_page=start_page,
         end_page=end_page,
-        posts=posts
+        posts=posts,
+        views=views
     )
 
 @bp_board.route(rule="/write/", methods=["GET", "POST"])
@@ -62,7 +66,7 @@ def write():
             new_files = []
             if files:
                 for file in files:
-                    new_file = File(original_name=file.filename)
+                    new_file = File(file=file)
                     upload_dir = os.path.join(app.static_folder, "upload")
 
                     if not os.path.exists(path=upload_dir):
@@ -85,6 +89,10 @@ def write():
 @login_required
 def view(post_id:int):
     post = Post.query.get(ident=post_id)
+    if not post:
+        flash("존재하지 않는 게시물입니다.")
+        return redirect(location=url_for(endpoint="board.main"))
+    
     if not PostViews.query.filter_by(post_id=post_id, user_id=current_user.id).first() and post.user.id != current_user.id:
         post.views.append(PostViews(user_id=current_user.id))
         post.view_count = len(post.views)

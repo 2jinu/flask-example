@@ -26,7 +26,7 @@
                         {{ post.id }}
                     </td>
                     <td class="text-start align-middle text-truncate" style="max-width: 150px;">
-                        <a href="{{ url_for('board.view', post_id=post.id) }}">{{ post.title }}</a>
+                        <a href="{{ url_for('board.view', post_id=post.id) }}" class="{% if (post.id in views) or (post.user.id == current_user.id ) %}text-muted{% endif %}">{{ post.title }}</a>
                     </td>
                     <td class="text-center align-middle">
                         {{ post.user.username }}
@@ -34,7 +34,7 @@
                     <td class="text-center align-middle">
                         {{ post.view_count }}
                     </td>
-                    <td class="text-center align-middle">
+                    <td class="text-center align-middle text-nowrap">
                         {{ post.created }}
                     </td>
                 </tr>

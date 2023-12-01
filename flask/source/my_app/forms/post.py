@@ -9,13 +9,11 @@ class WriteForm(FlaskForm):
         validators=[
             DataRequired(message="제목을 입력하세요."),
             Length(min=1, max=255, message="제목은 1자 이상, 255자 이하여야 합니다.")
-        ]
+        ],
+        render_kw={"autofocus": True}
     )
     content = TextAreaField(
-        label="내용",
-        # validators=[
-        #     DataRequired(message="내용을 입력하세요.")
-        # ]
+        label="내용"
     )
     attachments = MultipleFileField(
         label="첨부파일"

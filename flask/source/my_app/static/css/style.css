@@ -1,5 +1,10 @@
 a, a:link, a:hover {
     text-decoration: none;
+    color: black;
+}
+
+th {
+    word-break: keep-all;
 }
 
 .cursor {
