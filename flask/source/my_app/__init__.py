@@ -2,6 +2,7 @@ from flask import Flask
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
+from flask_caching import Cache
 from redis import StrictRedis
 
 from config import config
@@ -10,6 +11,7 @@ app     = Flask(import_name=__name__, template_folder="templates")
 db      = SQLAlchemy()
 lm      = LoginManager()
 jwt     = JWTManager()
+cache   = Cache()
 rc      = StrictRedis(host="redis", port=6379, db=0)
 
 def create_app():
@@ -34,6 +36,9 @@ def create_app():
         lm.init_app(app=app)
 
         jwt.init_app(app=app)
+
+        cache.init_app(app=app)
+        cache.clear()
         
         return app
     

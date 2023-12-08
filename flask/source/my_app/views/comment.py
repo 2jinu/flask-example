@@ -18,7 +18,7 @@ def write(post_id:int):
     
     form = CommentForm()
     if form.validate_on_submit():
-        new_comment = Comment(content=form.content.data, username=current_user.username)
+        new_comment = Comment(content=form.content.data, secret=form.secret.data, username=current_user.username)
         post.comments.append(new_comment)
         current_user.comments.append(new_comment)
         db.session.add(instance=new_comment)

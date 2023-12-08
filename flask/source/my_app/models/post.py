@@ -88,7 +88,7 @@ class File(db.Model):
     size = Column(
         INTEGER(display_width=11, unsigned=True),
         nullable=False,
-        comment="파일 크기 (KB)"
+        comment="파일 크기 (Byte)"
     )
     hash = Column(
         CHAR(length=128),
@@ -99,8 +99,10 @@ class File(db.Model):
     def __init__(self, file:FileStorage):
         self.original_name = secure_filename(filename=file.filename)
         self.stored_name = sha3_256(f"{datetime.now()}{self.original_name}".encode()).hexdigest()
-        self.size = int(len(file.read()) / 1024)
-        self.hash = sha256(string=file.read()).hexdigest()
+        file_data = file.read()
+        file.seek(0)
+        self.size = int(len(file_data))
+        self.hash = sha256(string=file_data).hexdigest()
     
     def __repr__(self) -> str:
         return f"File(id={self.id}, original_name={self.original_name}, stored_name={self.stored_name}, size={self.size}, hash={self.hash})"

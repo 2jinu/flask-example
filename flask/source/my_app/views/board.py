@@ -59,13 +59,12 @@ def write():
             files = form.attachments.data
             new_files = []
             if files:
+                upload_dir = os.path.join(app.static_folder, "upload")
+                if not os.path.exists(path=upload_dir):
+                    os.mkdir(path=upload_dir)
+
                 for file in files:
                     new_file = File(file=file)
-                    upload_dir = os.path.join(app.static_folder, "upload")
-
-                    if not os.path.exists(path=upload_dir):
-                        os.mkdir(path=upload_dir)
-
                     file.save(os.path.join(upload_dir, new_file.stored_name))
                     new_files.append(new_file)
 
@@ -110,11 +109,65 @@ def delete(post_id:int):
     if current_user.is_admin():
         post = Post.query.filter_by(id=post_id).first()
     else:
-        post = Post.query.filter_by(id=post_id, username=current_user.username).first()
+        post = Post.query.filter_by(id=post_id, user=current_user).first()
     
     if post:
+        if post.files:
+            upload_dir = os.path.join(app.static_folder, "upload")
+            for file in post.files:
+                file_path = os.path.join(upload_dir, file.stored_name)
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+
+                db.session.delete(instance=file)
+
         db.session.delete(instance=post)
         db.session.commit()
+    
+    return redirect(location=url_for(endpoint="board.main"))
+
+@bp_board.route(rule="/<int:post_id>/edit", methods=["GET", "POST"])
+@login_required
+def edit(post_id:int):
+    post = Post.query.filter_by(id=post_id, user=current_user).first()
+    if post:
+        form = WriteForm()
+        if request.method == "GET":
+            form.title.data = post.title
+            form.content.data = post.content
+            return render_template("board/edit.html", form=form, post_id=post_id)
+        elif request.method == "POST":
+            if form.validate_on_submit():
+                upload_dir = os.path.join(app.static_folder, "upload")
+
+                for file in post.files:
+                    file_path = os.path.join(upload_dir, file.stored_name)
+                    if os.path.exists(file_path):
+                        os.remove(file_path)
+
+                    db.session.delete(instance=file)
+                
+                post.title = form.title.data
+                post.content = form.content.data
+
+                files = form.attachments.data
+                if files:
+                    new_files = []
+                    for file in files:
+                        new_file = File(file=file)
+                        file.save(os.path.join(upload_dir, new_file.stored_name))
+                        new_files.append(new_file)
+
+                    post.files = new_files
+                db.session.commit()
+
+                return redirect(location=url_for(endpoint="board.view", post_id=post.id))
+            else:
+                for _, values in form.errors.items():
+                    for value in values:
+                        flash(message=value)
+    else:
+        flash(message="존재하지 않는 게시물입니다.")
     
     return redirect(location=url_for(endpoint="board.main"))
 

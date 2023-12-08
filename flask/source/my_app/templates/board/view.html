@@ -13,7 +13,7 @@
             <div class="fw-bold display-5 text-break">{{ post.title }}</div>
             <div>
                 {% if post.user.id == current_user.id %}
-                <span class="cursor">수정</span>
+                <a href="{{ url_for('board.edit', post_id=post.id) }}" class="text-primary">수정</a>
                 {% endif %}
                 {% if post.user.id == current_user.id or current_user.is_admin() %}
                 <span class="cursor text-danger" onclick="confirmDeletePost('{{ url_for('board.delete', post_id=post.id) }}')">삭제</span>
@@ -40,11 +40,11 @@
         <div class="px-4 mb-1">
             <small>첨부파일</small>
         </div>
-        <div class="py-1 px-4 border-top border-bottom border-secondary">
+        <div class="py-3 px-4 mb-3 border-top border-secondary">
         {% for file in post.files %}
             <div class="py-1 text-truncate">
                 <a href="{{ url_for('board.download', post_id=post.id, file_id=file.id) }}">{{ file.original_name }}</a>
-                <small class="text-muted">[SIZE : {{ file.size }} KB]</small>
+                <small class="text-muted">[SIZE : {{ file.size }} Byte]</small>
                 <small class="text-muted">[SHA-256 : {{ file.hash }}]</small>
             </div>
         {% endfor %}

@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import MultipleFileField
-from wtforms import StringField, TextAreaField, SubmitField
+from wtforms import StringField, TextAreaField, BooleanField, SubmitField
 from wtforms.validators import DataRequired, Length
 
 class WriteForm(FlaskForm):
@@ -28,6 +28,9 @@ class CommentForm(FlaskForm):
         validators=[
             DataRequired(message="댓글을 입력하세요.")
         ]
+    )
+    secret = BooleanField(
+        label="비밀 댓글"
     )
     submit = SubmitField(
         label="작성"

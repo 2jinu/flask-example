@@ -19,6 +19,11 @@ class Config:
     JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(minutes=15)
     JWT_REFRESH_TOKEN_EXPIRES = datetime.timedelta(days=7)
 
+    # Cache
+    CACHE_TYPE = "RedisCache"
+    CACHE_REDIS_HOST = "redis"
+    CACHE_DEFAULT_TIMEOUT = 300
+
 class ProductionConfig(Config):
     DEBUG = False
 
