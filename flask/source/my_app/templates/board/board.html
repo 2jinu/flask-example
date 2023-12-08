@@ -12,7 +12,7 @@
             <thead>
                 <tr>
                     <th class="text-center align-middle col-1" scope="col">번호</th>
-                    <th class="text-center align-middle col-auto" scope="col">제목</th>
+                    <th class="text-center align-middle col-7" scope="col">제목</th>
                     <th class="text-center align-middle col-1" scope="col">글쓴이</th>
                     <th class="text-center align-middle col-1" scope="col">조회수</th>
                     <th class="text-center align-middle col-2" scope="col">등록일시</th>
@@ -26,13 +26,16 @@
                         {{ post.id }}
                     </td>
                     <td class="text-start align-middle text-truncate" style="max-width: 150px;">
+                        {% if post.comments|length > 0 %}
+                        <span class="text-danger"> [{{ post.comments|length }}]</span>
+                        {% endif %}
                         <a href="{{ url_for('board.view', post_id=post.id) }}" class="{% if (post.id in views) or (post.user.id == current_user.id ) %}text-muted{% endif %}">{{ post.title }}</a>
                     </td>
                     <td class="text-center align-middle">
                         {{ post.user.username }}
                     </td>
                     <td class="text-center align-middle">
-                        {{ post.view_count }}
+                        {{ post.views }}
                     </td>
                     <td class="text-center align-middle text-nowrap">
                         {{ post.created }}

@@ -1,11 +1,10 @@
 import os
-from flask import Blueprint, request, render_template, redirect, url_for, flash, send_file
+from flask import Blueprint, request, render_template, redirect, url_for, flash, send_file, session
 from flask_login import login_required, current_user
 
 from my_app import db, app
-from my_app.models.user import role_required
-from my_app.models.post import Post, File, PostViews
-from my_app.forms.post import WriteForm
+from my_app.models.post import Post, File
+from my_app.forms.post import WriteForm, CommentForm
 
 PER_PAGE = 10
 MAX_PAGE = 10
@@ -41,20 +40,15 @@ def main():
     if end_page == 0:
         end_page = 1
 
-    views = PostViews.query.filter_by(user_id=current_user.id).all()
-    views = [view.post_id for view in views]
-
     return render_template(
         template_name_or_list="board/board.html",
         start_page=start_page,
         end_page=end_page,
-        posts=posts,
-        views=views
+        posts=posts
     )
 
 @bp_board.route(rule="/write/", methods=["GET", "POST"])
 @login_required
-@role_required(roles=["ADMIN", "USER"])
 def write():
     form = WriteForm()
     if request.method == "GET":
@@ -78,6 +72,7 @@ def write():
             new_post = Post(title=form.title.data, content=form.content.data, user=current_user, files=new_files)
             db.session.add(instance=new_post)
             db.session.commit()
+            return redirect(location=url_for(endpoint="board.view", post_id=new_post.id))
         else:
             for _, values in form.errors.items():
                 for value in values:
@@ -90,18 +85,38 @@ def write():
 def view(post_id:int):
     post = Post.query.get(ident=post_id)
     if not post:
-        flash("존재하지 않는 게시물입니다.")
+        flash(message="존재하지 않는 게시물입니다.")
         return redirect(location=url_for(endpoint="board.main"))
     
-    if not PostViews.query.filter_by(post_id=post_id, user_id=current_user.id).first() and post.user.id != current_user.id:
-        post.views.append(PostViews(user_id=current_user.id))
-        post.view_count = len(post.views)
+    if "views" not in session:
+        session["views"] = []
+    
+    if post_id not in session["views"]:
+        session["views"].append(post_id)
+        post.views += 1
         db.session.commit()
 
+    form = CommentForm()
+    post.comments = list(reversed(post.comments))
     return render_template(
         template_name_or_list="board/view.html",
-        post=post
+        post=post,
+        form=form
     )
+
+@bp_board.route(rule="/<int:post_id>/delete", methods=["GET"])
+@login_required
+def delete(post_id:int):
+    if current_user.is_admin():
+        post = Post.query.filter_by(id=post_id).first()
+    else:
+        post = Post.query.filter_by(id=post_id, username=current_user.username).first()
+    
+    if post:
+        db.session.delete(instance=post)
+        db.session.commit()
+    
+    return redirect(location=url_for(endpoint="board.main"))
 
 @bp_board.route(rule="/<int:post_id>/files/<string:file_id>", methods=["GET"])
 @login_required
@@ -118,4 +133,4 @@ def download(post_id:int, file_id:int):
                 download_name=file.original_name
             )
     
-    return redirect(location=url_for(endpoint="board.main"))
+    return redirect(location=url_for(endpoint="board.view", post_id=post_id))

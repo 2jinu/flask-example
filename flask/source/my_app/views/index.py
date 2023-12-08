@@ -4,7 +4,8 @@ from flask_login import login_user, login_required, logout_user, current_user
 
 from my_app import db
 from my_app.forms.user import LoginForm, RegistrationForm
-from my_app.models.user import User, Role
+from my_app.models.user import User
+from my_app.models.role import Role
 
 bp_index = Blueprint(
     name="index",
@@ -54,7 +55,16 @@ def regist():
         )
     else:
         if form.validate_on_submit():
-            user = User(username=form.username.data, password=form.password.data, roles=[Role.query.filter_by(name="USER").first()])
+            role = Role.query.filter_by(name="USER").first()
+            if not role:
+                flash(message="권한 오류가 발생하였습니다.")
+                return redirect(location=url_for(endpoint="index.login"))
+
+            user = User(
+                username=form.username.data,
+                password=form.password.data,
+                roles=[role]
+            )
             db.session.add(instance=user)
             try:
                 db.session.commit()
@@ -64,9 +74,9 @@ def regist():
             except IntegrityError as e:
                 db.session.rollback()
                 if e.orig.args and e.orig.args[0] == 1062:
-                    flash("중복된 사용자입니다.")
+                    flash(message="중복된 사용자입니다.")
                 else:
-                    flash("알 수 없는 오류입니다.")
+                    flash(message="알 수 없는 오류입니다.")
         else:
             for _, values in form.errors.items():
                 for value in values:

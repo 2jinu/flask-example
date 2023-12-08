@@ -33,7 +33,7 @@ class Post(db.Model):
         default=func.now(),
         comment="게시글 작성 일시"
     )
-    view_count = Column(
+    views = Column(
         INTEGER(display_width=11, unsigned=True),
         nullable=False,
         default=0,
@@ -51,8 +51,9 @@ class Post(db.Model):
         backref=backref(name="posts", lazy="dynamic"),
         uselist=True
     )
-    views = relationship(
-        argument="PostViews",
+    comments = relationship(
+        argument="Comment",
+        secondary="rel_post_comments",
         backref=backref(name="posts"),
         uselist=True
     )
@@ -103,7 +104,7 @@ class File(db.Model):
     
     def __repr__(self) -> str:
         return f"File(id={self.id}, original_name={self.original_name}, stored_name={self.stored_name}, size={self.size}, hash={self.hash})"
-
+    
 class UserPosts(db.Model):
     __tablename__ = "rel_user_posts"
     id = Column(
@@ -146,13 +147,13 @@ class PostFiles(db.Model):
         comment="첨부파일 식별 값"
     )
 
-class PostViews(db.Model):
-    __tablename__ = "rel_post_views"
+class PostComments(db.Model):
+    __tablename__ = "rel_post_comments"
     id = Column(
         INTEGER(display_width=11, unsigned=True),
         primary_key=True,
         autoincrement="auto",
-        comment="게시글 조회 매핑 식별 값"
+        comment="사용자 댓글 매핑 식별 값"
     )
     post_id = Column(
         INTEGER(display_width=11, unsigned=True),
@@ -160,9 +161,9 @@ class PostViews(db.Model):
         nullable=False,
         comment="게시글 식별 값"
     )
-    user_id = Column(
+    comment_id = Column(
         INTEGER(display_width=11, unsigned=True),
-        ForeignKey(column="users.id"),
+        ForeignKey(column="comments.id", ondelete="CASCADE"),
         nullable=False,
-        comment="사용자 식별 값"
+        comment="댓글 식별 값"
     )

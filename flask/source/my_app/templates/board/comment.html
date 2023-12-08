@@ -1,0 +1,40 @@
+<div class="px-4 mb-1">
+    <small>댓글</small>
+</div>
+<div class="py-1 px-4 border-top border-secondary">
+    <form action="{{ url_for('comment.write', post_id=post.id) }}" id="form" method="post" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+
+        <div class="input-group mb-3">
+            <span class="input-group-text">{{ form.content.label(class="fw-bold") }}</span>
+            {{ form.content(class="form-control", rows=3, style="resize: none;") }}
+            {{ form.submit(class="btn btn-primary input-group-text") }}
+        </div>
+    </form>
+
+    {% for comment in post.comments %}
+    <div class="py-3 px-4 mb-1 border rounded">
+        <div class="d-flex justify-content-between">
+            <div>
+                <small class="fw-bold">{{ comment.username }}</small><small> &#183; {{ comment.created }}</small>
+            </div>
+            <div>
+                {% if comment.username == current_user.username or current_user.is_admin() %}
+                <small class="cursor text-danger" onclick="confirmDeleteComment('{{ url_for('comment.delete', post_id=post.id, comment_id=comment.id) }}')">삭제</small>
+                {% endif %}
+            </div>
+        </div>
+        <div class="text-break">
+            {{ comment.content | replace("\n", "<br>") | safe }}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+    function confirmDeleteComment(delete_url) {
+        if (confirm("정말로 삭제하시겠습니까?")) {
+            window.location.href=delete_url;
+        }
+    }
+</script>

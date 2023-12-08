@@ -21,3 +21,14 @@ class WriteForm(FlaskForm):
     submit = SubmitField(
         label="작성"
     )
+
+class CommentForm(FlaskForm):
+    content = TextAreaField(
+        label="내용",
+        validators=[
+            DataRequired(message="댓글을 입력하세요.")
+        ]
+    )
+    submit = SubmitField(
+        label="작성"
+    )
