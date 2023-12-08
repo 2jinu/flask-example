@@ -1,6 +1,7 @@
-from sqlalchemy.exc import IntegrityError
+from datetime import timedelta
 from flask import Blueprint, render_template, flash, redirect, url_for, request
 from flask_login import login_user, login_required, logout_user, current_user
+from sqlalchemy.exc import IntegrityError
 
 from my_app import db, cache, rc, app
 from my_app.forms.user import LoginForm, RegistrationForm
@@ -14,7 +15,6 @@ bp_index = Blueprint(
 )
 
 @bp_index.route(rule="/", methods=["GET", "POST"])
-@cache.cached()
 def login():
     if current_user.is_authenticated:
         return redirect(location=url_for(endpoint="board.main"))
@@ -28,11 +28,29 @@ def login():
         )
     else:
         if form.validate_on_submit():
+            login_attempts = rc.get(name=form.username.data)
+            if login_attempts:
+                try:
+                    login_attempts = int(login_attempts.decode())
+                    if login_attempts >= 5:
+                        locked_time = rc.ttl(name=form.username.data)
+                        minute, seccond = divmod(locked_time, 60)
+                        flash(message=f"{minute:02d}:{seccond:02d} 뒤에 시도하세요.")
+                        return redirect(location=url_for(endpoint="index.login"))
+                except ValueError:
+                    login_attempts = None
+
             user = User.query.filter_by(username=form.username.data).first()
             if user:
                 if user.check_password(password=form.password.data):
+                    rc.delete(user.username)
                     login_user(user=user)
                     return redirect(location=url_for(endpoint="board.main"))
+                else:
+                    if login_attempts:
+                        rc.incr(name=user.username)
+                    else:
+                        rc.set(name=user.username, value=1, ex=timedelta(minutes=5))
                 
             flash(message="로그인에 실패하였습니다.")
         else:

@@ -26,7 +26,7 @@ class LoginForm(FlaskForm):
         validators=[
             DataRequired(message="아이디를 입력하세요."),
             Length(max=10, message="로그인에 실패하였습니다."),
-            UsernameFilter(banned=[], regex=r"^[a-z0-9_]*$")
+            UsernameFilter(banned=[], regex=r"^[a-z0-9_]*$", message="로그인에 실패하였습니다.")
         ],
         render_kw={"autofocus": True, "placeholder": ""}
     )
