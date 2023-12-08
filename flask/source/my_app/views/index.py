@@ -3,7 +3,7 @@ from flask import Blueprint, render_template, flash, redirect, url_for, request
 from flask_login import login_user, login_required, logout_user, current_user
 from sqlalchemy.exc import IntegrityError
 
-from my_app import db, cache, rc, app
+from my_app import db, rc
 from my_app.forms.user import LoginForm, RegistrationForm
 from my_app.models.user import User
 from my_app.models.role import Role
