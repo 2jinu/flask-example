@@ -2,7 +2,7 @@ import os
 from flask import Blueprint, request, render_template, redirect, url_for, flash, send_file, session
 from flask_login import login_required, current_user
 
-from my_app import db, app, cache
+from my_app import db, app
 from my_app.models.post import Post, File
 from my_app.forms.post import WriteForm, CommentForm
 
@@ -81,7 +81,6 @@ def write():
 
 @bp_board.route(rule="/<int:post_id>/", methods=["GET"])
 @login_required
-@cache.cached()
 def view(post_id:int):
     post = Post.query.get(ident=post_id)
     if not post:
