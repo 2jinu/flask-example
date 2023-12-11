@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container-fluid">
+    {% include "nav.html" %}
+    {% include "loading.html" %}
+
+    <div class="container py-3 d-none" id="dashboard">
+        <div class="row m-0">
+            <div class="row m-0 text-end">
+                <div class="col">
+                    <span>갱신됨 : <span id="current">0000-00-00 00:00:00</span></span>
+                </div>
+            </div>
+
+            <div class="row m-0 mb-3">
+                <div class="col-md">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">CPU</h5>
+                            <div class="card-text col-lg d-flex justify-content-center align-items-center">
+                                <canvas id="cpuChart" style="max-height: 164px;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row m-0">
+                <div class="col-md mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">MEMORY</h5>
+                            <div class="row m-0">
+                                <div class="card-text col-lg d-flex flex-column justify-content-center">
+                                    <p class="m-0">사용 : <span id="memoryUsed" class="fw-bold">0</span> GB</p>
+                                    <p class="m-0">전체 : <span id="memoryTotal" class="fw-bold">0</span> GB</p>
+                                </div>
+                                <div class="card-text col-lg d-flex justify-content-center align-items-center">
+                                    <canvas id="memoryChart" width="150" height="150"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">DISK</h5>
+                            <div class="row m-0">
+                                <div class="card-text col-lg d-flex flex-column justify-content-center">
+                                    <p class="m-0">사용 : <span id="diskUsed" class="fw-bold">0</span> GB</p>
+                                    <p class="m-0">전체 : <span id="diskTotal" class="fw-bold">0</span> GB</p>
+                                </div>
+                                <div class="card-text col-lg d-flex justify-content-center align-items-center">
+                                    <canvas id="diskChart" width="150" height="150"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const loaderContainer = $(".loader-container");
+    const limitCpuChart = 10;
+    const textPlugin = {
+        id: "text",
+        beforeDraw: function(chart, a, b) {
+            var width = chart.width;
+            var height = chart.height;
+            var ctx = chart.ctx;
+            ctx.restore();
+
+            var fontSize = (height / 100).toFixed(2);
+            ctx.font = "bold " + fontSize + "em arial";
+            ctx.textBaseline = "middle";
+
+            var total = chart.data.datasets[0].data[0] + chart.data.datasets[0].data[1];
+            var used = chart.data.datasets[0].data[0];
+            var text = (used / total * 100).toFixed(2) + "%";
+            var textX = Math.round((width - ctx.measureText(text).width) / 2);
+            var textY = height / 2;
+
+            ctx.fillText(text, textX, textY);
+            ctx.save();
+        }
+    }
+    const doughnutOptions = {
+        responsive: false,
+        cutout: "80%",
+        plugins: {
+            legend: {
+                display: false
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(tooltipItem, data) {
+                        return tooltipItem.formattedValue + " GB";
+                    }
+                }
+            },
+        }
+    }
+    const doughnutlabels = ["사용 중", "사용 가능"];
+    const doughnutBackgroundColor = ["rgba(75, 192, 192, 1)", "rgba(204, 204, 204, 1)"];
+    const doughnutBorderColor = ["rgba(75, 192, 192, 1)", "rgba(255, 255, 255, 1)"];
+    const doughnutHoverBorderWidth = [2, 2];
+    const doughnutBorderWidth = [0, 6];
+    const memoryChartOptions = {
+        type: "doughnut",
+        data: {
+            labels: doughnutlabels,
+            datasets: [{
+                data: ["0", "0"],
+                backgroundColor: doughnutBackgroundColor,
+                hoverBorderColor: doughnutBorderColor,
+                hoverBorderWidth: doughnutHoverBorderWidth,
+                borderWidth: doughnutBorderWidth,
+                borderColor: doughnutBorderColor,
+            }]
+        },
+        plugins: [textPlugin],
+        options: doughnutOptions
+    };
+    const diskChartOptions = {
+        type: "doughnut",
+        data: {
+            labels: doughnutlabels,
+            datasets: [{
+                data: ["0", "0"],
+                backgroundColor: doughnutBackgroundColor,
+                hoverBorderColor: doughnutBorderColor,
+                hoverBorderWidth: doughnutHoverBorderWidth,
+                borderWidth: doughnutBorderWidth,
+                borderColor: doughnutBorderColor,
+            }]
+        },
+        plugins: [textPlugin],
+        options: doughnutOptions
+    };
+    const cpuChartOptions = {
+        type: "line",
+        data: {
+            labels: [],
+            datasets: [{
+                borderColor: "rgba(75, 192, 192, 1)",
+                pointBackgroundColor: "rgba(75, 192, 192, 1)",
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(tooltipItem, data) {
+                            return tooltipItem.formattedValue + " %";
+                        }
+                    }
+                },
+                text: false
+            },
+            scales: {
+                y: {
+                    min: 0,
+                    max: 100,
+                }
+            }
+        }
+    }
+
+    const cpuChartCtx = document.getElementById("cpuChart").getContext("2d");
+    const memoryChartCtx = document.getElementById("memoryChart").getContext("2d");
+    const diskChartCtx = document.getElementById("diskChart").getContext("2d");
+    const cpuChart = new Chart(cpuChartCtx, cpuChartOptions);
+    const memoryChart = new Chart(memoryChartCtx, memoryChartOptions);
+    const diskChart = new Chart(diskChartCtx, diskChartOptions);
+
+    var socket = io.connect();
+    socket.on("updateResource", function (msg) {
+        if (loaderContainer.hasClass("d-flex")) {
+            $(".loader-container").removeClass("d-flex");
+            $(".loader-container").addClass("d-none");
+            $("#dashboard").removeClass("d-none");
+        }
+
+        updateLineChart(cpuChart, [msg.current, msg.cpu]);
+        updatePieChart(memoryChart, [msg.memory.used, msg.memory.total - msg.memory.used]);
+        updatePieChart(diskChart, [msg.disk.used, msg.disk.total - msg.disk.used]);
+        $("#memoryUsed").text(msg.memory.used);
+        $("#memoryTotal").text(msg.memory.total);
+        $("#diskUsed").text(msg.disk.used);
+        $("#diskTotal").text(msg.disk.total);
+        $("#current").text(msg.current);
+    });
+
+    function updateLineChart(chart, newData) {
+        if (chart.data.labels.length >= limitCpuChart) {
+            chart.data.labels.shift();
+            chart.data.datasets[0].data.shift();
+        }
+        var date = new Date(newData[0]);
+        var minutes = date.getMinutes();
+        var seconds = date.getSeconds();
+        var formattedMinutes = (minutes < 10 ? '0' : '') + minutes;
+        var formattedSeconds = (seconds < 10 ? '0' : '') + seconds;
+        var formattedTime = formattedMinutes + ':' + formattedSeconds;
+
+        chart.data.labels.push(formattedTime);
+        chart.data.datasets[0].data.push(newData[1]);
+        chart.update();
+    }
+    function updatePieChart(chart, newData) {
+        // used
+        chart.data.datasets[0].data[0] = newData[0];
+        // available
+        chart.data.datasets[0].data[1] = newData[1];
+        chart.update();
+    }
+</script>
+
+{% endblock %}

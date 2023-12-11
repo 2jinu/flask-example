@@ -3,6 +3,7 @@ from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 from flask_caching import Cache
+from flask_socketio import SocketIO
 from redis import StrictRedis
 
 from config import config
@@ -12,6 +13,7 @@ db      = SQLAlchemy()
 lm      = LoginManager()
 jwt     = JWTManager()
 cache   = Cache()
+sock    = SocketIO()
 rc      = StrictRedis(host="redis", port=6379, db=0)
 
 def create_app():
@@ -21,11 +23,13 @@ def create_app():
         from my_app.views.index import bp_index
         from my_app.views.board import bp_board
         from my_app.views.comment import bp_comment
+        from my_app.views.dashboard import bp_dashboard
         from my_app.api.v1 import bp_api
 
         app.register_blueprint(blueprint=bp_index)
         app.register_blueprint(blueprint=bp_board)
         app.register_blueprint(blueprint=bp_comment)
+        app.register_blueprint(blueprint=bp_dashboard)
         app.register_blueprint(blueprint=bp_api)
 
         db.init_app(app=app)
@@ -39,6 +43,8 @@ def create_app():
 
         cache.init_app(app=app)
         cache.clear()
+
+        sock.init_app(app=app)
         
         return app
     
