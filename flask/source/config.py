@@ -22,7 +22,7 @@ class Config:
     # Cache
     CACHE_TYPE = "RedisCache"
     CACHE_REDIS_HOST = "redis"
-    CACHE_DEFAULT_TIMEOUT = 60
+    CACHE_DEFAULT_TIMEOUT = 10
 
 class ProductionConfig(Config):
     DEBUG = False

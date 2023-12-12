@@ -24,12 +24,14 @@ def create_app():
         from my_app.views.board import bp_board
         from my_app.views.comment import bp_comment
         from my_app.views.dashboard import bp_dashboard
+        from my_app.views.cache import bp_cache
         from my_app.api.v1 import bp_api
 
         app.register_blueprint(blueprint=bp_index)
         app.register_blueprint(blueprint=bp_board)
         app.register_blueprint(blueprint=bp_comment)
         app.register_blueprint(blueprint=bp_dashboard)
+        app.register_blueprint(blueprint=bp_cache)
         app.register_blueprint(blueprint=bp_api)
 
         db.init_app(app=app)
