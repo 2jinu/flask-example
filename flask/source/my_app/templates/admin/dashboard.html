@@ -6,7 +6,8 @@
     {% include "nav.html" %}
     {% include "loading.html" %}
 
-    <div class="container py-3 d-none" id="dashboard">
+    <!-- <div class="container py-3 d-none" id="dashboard"> -->
+    <div class="container py-3">
         <div class="row m-0">
             <div class="row m-0 text-end">
                 <div class="col">
@@ -91,7 +92,7 @@
         }
     }
     const doughnutOptions = {
-        responsive: false,
+        responsive: true,
         cutout: "80%",
         plugins: {
             legend: {
@@ -188,7 +189,7 @@
         if (loaderContainer.hasClass("d-flex")) {
             $(".loader-container").removeClass("d-flex");
             $(".loader-container").addClass("d-none");
-            $("#dashboard").removeClass("d-none");
+            // $("#dashboard").removeClass("d-none");
         }
 
         updateLineChart(cpuChart, [msg.current, msg.cpu]);

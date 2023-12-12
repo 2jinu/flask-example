@@ -63,3 +63,7 @@ th {
 .password-toggle:active {
     transform: scale(0.9);
 }
+
+.navbar {
+    z-index: 1000;
+}
