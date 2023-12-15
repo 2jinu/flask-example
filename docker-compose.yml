@@ -40,6 +40,7 @@ services:
       - 80:5000
     depends_on:
       - mariadb
+      - redis
     volumes:
       - ./flask/source:/source
     environment:

@@ -4,7 +4,7 @@ from flask_login import login_required, current_user
 from my_app import db, app
 from my_app.models.post import Post
 from my_app.models.comment import Comment
-from my_app.forms.post import CommentForm
+from my_app.forms.comment import CommentForm
 
 bp_comment = Blueprint(name="comment", import_name=__name__, url_prefix="/board/<int:post_id>/comment/", template_folder="templates/board")
 

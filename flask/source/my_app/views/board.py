@@ -3,20 +3,43 @@ from flask import Blueprint, request, render_template, redirect, url_for, flash,
 from flask_login import login_required, current_user
 
 from my_app import db, app
+from my_app.models.user import User
 from my_app.models.post import Post, File
-from my_app.forms.post import WriteForm, CommentForm
+from my_app.forms.post import WriteForm, SearchForm
+from my_app.forms.comment import CommentForm
 
 PER_PAGE = 10
 MAX_PAGE = 10
 
 bp_board = Blueprint(name="board", import_name=__name__, url_prefix="/board/", template_folder="templates/board")
 
-@bp_board.route(rule="/", methods=["GET"])
+@bp_board.route(rule="/", methods=["GET", "POST"])
 @login_required
 def main():
     page = request.args.get(key="p", default=1, type=int)
+    form = SearchForm()
 
-    posts = Post.query.order_by(
+    if request.method == "POST":
+        if form.validate_on_submit():
+            session["search_by"] = form.search_by.data
+            session["search"] = form.search.data
+        else:
+            for _, values in form.errors.items():
+                for value in values:
+                    flash(message=value)
+
+    search_by = session.get("search_by", "")
+    search = session.get("search", "")
+
+    if search_by == "title":
+        posts = Post.query.filter(Post.title.ilike(f"%{search}%"))
+    elif search_by == "user":
+        user = User.query.filter(User.username.ilike(f"%{search}%")).first()
+        posts = Post.query.filter(Post.user == user)
+    else:
+        posts = Post.query.filter(Post.content.ilike(f"%{search}%"))
+
+    posts = posts.order_by(
         Post.created.desc()
     ).paginate(
         page=page,
@@ -27,24 +50,37 @@ def main():
     if posts.pages <= MAX_PAGE:
         start_page = 1
         end_page = posts.pages
-    elif posts.page <= (MAX_PAGE // 2) + 1:
-        start_page = 1
-        end_page = MAX_PAGE
-    elif posts.page >= posts.pages - (MAX_PAGE // 2):
-        start_page = posts.pages - (MAX_PAGE - 1)
-        end_page = posts.pages
+
+        prev_page = 0
+        next_page = 0
+    elif (page % MAX_PAGE) == 0:
+        start_page = ((page - 1) // MAX_PAGE) * MAX_PAGE + 1
+        end_page = ((page // MAX_PAGE)) * MAX_PAGE
+
+        prev_page = start_page - MAX_PAGE
+        next_page = end_page + 1
     else:
-        start_page = posts.page - (MAX_PAGE // 2)
-        end_page = posts.page + (MAX_PAGE // 2)
-    
-    if end_page == 0:
-        end_page = 1
+        start_page = (page // MAX_PAGE) * MAX_PAGE + 1
+        end_page = ((page // MAX_PAGE) + 1) * MAX_PAGE
+
+        prev_page = start_page - MAX_PAGE
+        next_page = end_page + 1
+
+    if end_page >= posts.pages:
+        end_page = posts.pages
+        next_page = 0
+
+    if prev_page < 1:
+        prev_page = 0
 
     return render_template(
         template_name_or_list="board/board.html",
+        posts=posts,
         start_page=start_page,
         end_page=end_page,
-        posts=posts
+        prev_page=prev_page,
+        next_page=next_page,
+        form=form
     )
 
 @bp_board.route(rule="/write/", methods=["GET", "POST"])

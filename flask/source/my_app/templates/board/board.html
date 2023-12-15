@@ -50,6 +50,19 @@
             </tbody>
         </table>
 
+        <div>
+            <form action="{{ url_for('board.main') }}" method="post">
+                {{ form.hidden_tag() }}
+                <div class="input-group mb-3">
+                    <span class="input-group-text p-0">{{ form.search_by(class="form-select") }}</span>
+                    {{ form.search(class="form-control") }}
+                    <button class="btn btn-primary input-group-text" type="submit">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+
         <nav aria-label="Page navigation example" class="d-flex justify-content-center">
             <ul class="pagination">
                 {% if posts.page != 1 %}
@@ -62,11 +75,19 @@
                 </li>
                 {% endif %}
 
+                <li class="page-item {% if prev_page == 0 %}disabled{% endif %}">
+                    <a class="page-link" href="{% if prev_page != 0 %}{{ url_for('board.main', p=prev_page) }}{% endif %}">&lt;</a>
+                </li>
+
                 {% for page_num in range(start_page, end_page + 1) %}
                 <li class="page-item {% if posts.page == page_num %}active{% endif %}">
                     <a class="page-link" href="{{ url_for('board.main', p=page_num) }}">{{ page_num }}</a>
                 </li>
                 {% endfor %}
+
+                <li class="page-item {% if next_page == 0 %}disabled{% endif %}">
+                    <a class="page-link" href="{% if next_page != 0 %}{{ url_for('board.main', p=next_page) }}{% endif %}">&gt;</a>
+                </li>
                 
                 {% if posts.page != posts.pages and end_page != 1 %}
                 <li class="page-item">

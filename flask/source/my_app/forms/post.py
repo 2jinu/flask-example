@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import MultipleFileField
-from wtforms import StringField, TextAreaField, BooleanField, SubmitField
+from wtforms import StringField, TextAreaField, SubmitField, SelectField
 from wtforms.validators import DataRequired, Length
 
 class WriteForm(FlaskForm):
@@ -22,15 +22,21 @@ class WriteForm(FlaskForm):
         label="작성"
     )
 
-class CommentForm(FlaskForm):
-    content = TextAreaField(
-        label="내용",
+class SearchForm(FlaskForm):
+    search_by = SelectField(
+        choices=[
+            ("title", "제목"),
+            ("content", "내용"),
+            ("user", "글쓴이")
+        ],
         validators=[
-            DataRequired(message="댓글을 입력하세요.")
+            DataRequired(message="검색 타입을 입력하세요.")
         ]
     )
-    secret = BooleanField(
-        label="비밀 댓글"
+    search = StringField(
+        validators=[
+            Length(min=0, max=50, message="검색어는 50자 이하여야 합니다.")
+        ]
     )
     submit = SubmitField(
         label="작성"
