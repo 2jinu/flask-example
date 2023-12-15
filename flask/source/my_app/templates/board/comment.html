@@ -19,7 +19,7 @@
 
     {% for comment in post.comments %}
     <div class="py-3 px-4 mb-1 border rounded">
-        {% if comment.secret and (post.user.id == current_user.id or comment.username == current_user.username) %}
+        {% if comment.secret and (post.username == current_user.username or comment.username == current_user.username) %}
         <div class="d-flex justify-content-between">
             <div>
                 <small class="fw-bold">{{ comment.username }}</small><small> &#183; {{ comment.created }}</small><small> <i class="fa-solid fa-lock"></i></small>

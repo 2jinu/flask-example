@@ -3,7 +3,6 @@ from flask import Blueprint, request, render_template, redirect, url_for, flash,
 from flask_login import login_required, current_user
 
 from my_app import db, app
-from my_app.models.user import User
 from my_app.models.post import Post, File
 from my_app.forms.post import WriteForm, SearchForm
 from my_app.forms.comment import CommentForm
@@ -11,7 +10,11 @@ from my_app.forms.comment import CommentForm
 PER_PAGE = 10
 MAX_PAGE = 10
 
-bp_board = Blueprint(name="board", import_name=__name__, url_prefix="/board/", template_folder="templates/board")
+bp_board = Blueprint(
+    name="board",
+    import_name=__name__,
+    url_prefix="/board/"
+)
 
 @bp_board.route(rule="/", methods=["GET", "POST"])
 @login_required
@@ -28,14 +31,16 @@ def main():
                 for value in values:
                     flash(message=value)
 
-    search_by = session.get("search_by", "")
+    search_by = session.get("search_by", "content")
     search = session.get("search", "")
+
+    form.search_by.data = search_by
+    form.search.data = search
 
     if search_by == "title":
         posts = Post.query.filter(Post.title.ilike(f"%{search}%"))
     elif search_by == "user":
-        user = User.query.filter(User.username.ilike(f"%{search}%")).first()
-        posts = Post.query.filter(Post.user == user)
+        posts = Post.query.filter(Post.username.ilike(f"%{search}%"))
     else:
         posts = Post.query.filter(Post.content.ilike(f"%{search}%"))
 
@@ -50,19 +55,18 @@ def main():
     if posts.pages <= MAX_PAGE:
         start_page = 1
         end_page = posts.pages
-
         prev_page = 0
         next_page = 0
+
     elif (page % MAX_PAGE) == 0:
         start_page = ((page - 1) // MAX_PAGE) * MAX_PAGE + 1
         end_page = ((page // MAX_PAGE)) * MAX_PAGE
-
         prev_page = start_page - MAX_PAGE
         next_page = end_page + 1
+
     else:
         start_page = (page // MAX_PAGE) * MAX_PAGE + 1
         end_page = ((page // MAX_PAGE) + 1) * MAX_PAGE
-
         prev_page = start_page - MAX_PAGE
         next_page = end_page + 1
 
@@ -70,20 +74,17 @@ def main():
         end_page = posts.pages
         next_page = 0
 
-    if prev_page < 1:
-        prev_page = 0
-
     return render_template(
         template_name_or_list="board/board.html",
         posts=posts,
         start_page=start_page,
-        end_page=end_page,
-        prev_page=prev_page,
+        end_page=end_page if end_page else 1,
+        prev_page=0 if prev_page < 1 else prev_page,
         next_page=next_page,
         form=form
     )
 
-@bp_board.route(rule="/write/", methods=["GET", "POST"])
+@bp_board.route(rule="/write", methods=["GET", "POST"])
 @login_required
 def write():
     form = WriteForm()
@@ -104,7 +105,7 @@ def write():
                     file.save(os.path.join(upload_dir, new_file.stored_name))
                     new_files.append(new_file)
 
-            new_post = Post(title=form.title.data, content=form.content.data, user=current_user, files=new_files)
+            new_post = Post(title=form.title.data, content=form.content.data, username=current_user.username, files=new_files)
             db.session.add(instance=new_post)
             db.session.commit()
             return redirect(location=url_for(endpoint="board.view", post_id=new_post.id))
@@ -115,7 +116,7 @@ def write():
 
     return redirect(location=url_for(endpoint="board.main"))
 
-@bp_board.route(rule="/<int:post_id>/", methods=["GET"])
+@bp_board.route(rule="/<int:post_id>", methods=["GET"])
 @login_required
 def view(post_id:int):
     post = Post.query.get(ident=post_id)
@@ -123,14 +124,14 @@ def view(post_id:int):
         flash(message="존재하지 않는 게시물입니다.")
         return redirect(location=url_for(endpoint="board.main"))
     
-    if "views" not in session:
+    if "views" not in session or not isinstance(session.get("views"), list):
         session["views"] = []
     
-    if post_id not in session["views"]:
+    if post_id not in session.get("views", []) and post.username != current_user.username:
         session["views"].append(post_id)
         post.views += 1
         db.session.commit()
-
+        
     form = CommentForm()
     post.comments = list(reversed(post.comments))
     return render_template(
@@ -223,3 +224,10 @@ def download(post_id:int, file_id:int):
             )
     
     return redirect(location=url_for(endpoint="board.view", post_id=post_id))
+
+@bp_board.route(rule="/delete_search", methods=["GET"])
+@login_required
+def delete_search():
+    session.pop("search_by", None)
+    session.pop("search", None)
+    return redirect(location=url_for(endpoint="board.main"))

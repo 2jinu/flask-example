@@ -3,8 +3,9 @@ import secrets
 import datetime
 
 class Config:
-    PROPAGATE_EXCEPTIONS = True
     SECRET_KEY = secrets.token_bytes(nbytes=16)
+    PROPAGATE_EXCEPTIONS = True
+    PERMANENT_SESSION_LIFETIME = datetime.timedelta(minutes=15)
 
     # DATABASE
     db_pt = os.environ["MARIADB_PORT"]
@@ -31,6 +32,7 @@ class DevelopmentConfig(Config):
     DEBUG = True
     SECRET_KEY = "8846fb3651e8f2b6f4c61a3fa4fab7e6"
     JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(days=7)
+    PERMANENT_SESSION_LIFETIME = datetime.timedelta(days=7)
 
 config  = {
     "development"   : DevelopmentConfig,

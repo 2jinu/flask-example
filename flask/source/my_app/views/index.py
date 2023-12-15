@@ -1,5 +1,5 @@
 from datetime import timedelta
-from flask import Blueprint, render_template, flash, redirect, url_for, request
+from flask import Blueprint, render_template, flash, redirect, url_for, request, session
 from flask_login import login_user, login_required, logout_user, current_user
 from sqlalchemy.exc import IntegrityError
 
@@ -45,6 +45,8 @@ def login():
                 if user.check_password(password=form.password.data):
                     rc.delete(user.username)
                     login_user(user=user)
+                    session.permanent = True
+                    session.modified = True
                     return redirect(location=url_for(endpoint="board.main"))
                 else:
                     if login_attempts:
@@ -103,7 +105,7 @@ def regist():
 
         return redirect(location=url_for(endpoint="index.login"))
   
-@bp_index.route(rule="/logout/", methods=["GET"])
+@bp_index.route(rule="/logout", methods=["GET"])
 @login_required
 def logout():
     logout_user()

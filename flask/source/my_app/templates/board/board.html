@@ -7,7 +7,15 @@
 
     <div class="container py-3">
         <a href="{{ url_for('board.write') }}" class="btn btn-primary mb-3">글쓰기</a>
+
+        {% if form.search.data|length > 0 %}
+        <div class="bg-secondary p-3 mb-3 rounded text-white text-center">
+            <span class="fw-bold">{{ dict(form.search_by.choices).get(form.search_by.data) }}</span>(으)로 "<span class="fw-bold">{{ form.search.data }}</span>"(를)을 검색한 결과
+            <a href="{{ url_for('board.delete_search') }}" class="text-danger"><i class="fa-solid fa-xmark"></i></a>
+        </div>
+        {% endif %}
         
+        <!-- Table -->
         <table class="table table-hover">
             <thead>
                 <tr>
@@ -29,10 +37,10 @@
                         {% if post.comments|length > 0 %}
                         <span class="text-danger"> [{{ post.comments|length }}]</span>
                         {% endif %}
-                        <a href="{{ url_for('board.view', post_id=post.id) }}" class="{% if (post.id in views) or (post.user.id == current_user.id ) %}text-muted{% endif %}">{{ post.title }}</a>
+                        <a href="{{ url_for('board.view', post_id=post.id) }}" class="{% if (post.id in views) or (post.username == current_user.username ) %}text-muted{% endif %}">{{ post.title }}</a>
                     </td>
                     <td class="text-center align-middle">
-                        {{ post.user.username }}
+                        {{ post.username }}
                     </td>
                     <td class="text-center align-middle">
                         {{ post.views }}
@@ -44,25 +52,25 @@
                 {% endfor %}
                 {% else %}
                 <tr>
-                    <td class="text-center" scope="row" colspan="4">작성된 글이 존재하지 않습니다.</td>
+                    <td class="text-center" scope="row" colspan="5">작성된 글이 존재하지 않습니다.</td>
                 </tr>
                 {% endif %}
             </tbody>
         </table>
 
-        <div>
-            <form action="{{ url_for('board.main') }}" method="post">
-                {{ form.hidden_tag() }}
-                <div class="input-group mb-3">
-                    <span class="input-group-text p-0">{{ form.search_by(class="form-select") }}</span>
-                    {{ form.search(class="form-control") }}
-                    <button class="btn btn-primary input-group-text" type="submit">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                    </button>
-                </div>
-            </form>
-        </div>
+        <!-- Search -->
+        <form action="{{ url_for('board.main') }}" method="post">
+            {{ form.hidden_tag() }}
+            <div class="input-group mb-3">
+                <span class="input-group-text p-0">{{ form.search_by(class="form-select") }}</span>
+                {{ form.search(class="form-control") }}
+                <button class="btn btn-primary input-group-text" type="submit">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+            </div>
+        </form>
 
+        <!-- Pagination -->
         <nav aria-label="Page navigation example" class="d-flex justify-content-center">
             <ul class="pagination">
                 {% if posts.page != 1 %}

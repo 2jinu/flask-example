@@ -8,7 +8,7 @@ from redis import StrictRedis
 
 from config import config
 
-app     = Flask(import_name=__name__, template_folder="templates")
+app     = Flask(import_name=__name__)
 db      = SQLAlchemy()
 lm      = LoginManager()
 jwt     = JWTManager()

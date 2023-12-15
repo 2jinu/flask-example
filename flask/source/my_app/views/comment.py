@@ -8,7 +8,7 @@ from my_app.forms.comment import CommentForm
 
 bp_comment = Blueprint(name="comment", import_name=__name__, url_prefix="/board/<int:post_id>/comment/", template_folder="templates/board")
 
-@bp_comment.route(rule="/write/", methods=["POST"])
+@bp_comment.route(rule="/write", methods=["POST"])
 @login_required
 def write(post_id:int):
     post = Post.query.get(ident=post_id)
@@ -30,7 +30,7 @@ def write(post_id:int):
 
     return redirect(location=url_for(endpoint="board.view", post_id=post_id))
 
-@bp_comment.route(rule="<int:comment_id>/delete/", methods=["GET"])
+@bp_comment.route(rule="<int:comment_id>/delete", methods=["GET"])
 @login_required
 def delete(comment_id:int, post_id:int):
     if current_user.is_admin():

@@ -27,6 +27,12 @@ class Post(db.Model):
         nullable=False,
         comment="게시글 내용"
     )
+    username = Column(
+        VARCHAR(length=50),
+        ForeignKey(column="users.username", onupdate="CASCADE"),
+        nullable=False,
+        comment="게시글 글쓴이"
+    )
     created = Column(
         DATETIME(),
         nullable=False,
@@ -38,12 +44,6 @@ class Post(db.Model):
         nullable=False,
         default=0,
         comment="게시글 조회수"
-    )
-    user = relationship(
-        argument="User",
-        secondary="rel_user_posts",
-        backref=backref(name="posts", lazy="dynamic"),
-        uselist=False
     )
     files = relationship(
         argument="File",
@@ -58,14 +58,14 @@ class Post(db.Model):
         uselist=True
     )
 
-    def __init__(self, title:str, content:str, user, files):
+    def __init__(self, title:str, content:str, username:str, files:list):
         self.title = title
         self.content = content
-        self.user = user
+        self.username = username
         self.files = files
 
     def __repr__(self):
-        return f"Post(id={self.id}, title={self.title}, created={self.created}, user={self.user}, files={self.files}, views={self.views})"
+        return f"Post(id={self.id}, title={self.title}, created={self.created}, username={self.username}, files={self.files}, views={self.views})"
     
 class File(db.Model):
     __tablename__ = "files"
@@ -106,27 +106,6 @@ class File(db.Model):
     
     def __repr__(self) -> str:
         return f"File(id={self.id}, original_name={self.original_name}, stored_name={self.stored_name}, size={self.size}, hash={self.hash})"
-    
-class UserPosts(db.Model):
-    __tablename__ = "rel_user_posts"
-    id = Column(
-        INTEGER(display_width=11, unsigned=True),
-        primary_key=True,
-        autoincrement="auto",
-        comment="사용자 게시글 매핑 식별 값"
-    )
-    user_id = Column(
-        INTEGER(display_width=11, unsigned=True),
-        ForeignKey(column="users.id", ondelete="CASCADE"),
-        nullable=False,
-        comment="사용자 식별 값"
-    )
-    post_id = Column(
-        INTEGER(display_width=11, unsigned=True),
-        ForeignKey(column="posts.id", ondelete="CASCADE"),
-        nullable=False,
-        comment="게시글 식별 값"
-    )
 
 class PostFiles(db.Model):
     __tablename__ = "rel_post_files"
