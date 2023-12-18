@@ -25,6 +25,10 @@ class Config:
     CACHE_REDIS_HOST = "redis"
     CACHE_DEFAULT_TIMEOUT = 10
 
+    # RESTx
+    RESTX_VALIDATE = True
+    RESTX_MASK_SWAGGER = False
+
 class ProductionConfig(Config):
     DEBUG = False
 

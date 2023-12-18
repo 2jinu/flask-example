@@ -67,6 +67,10 @@ class Post(db.Model):
     def __repr__(self):
         return f"Post(id={self.id}, title={self.title}, created={self.created}, username={self.username}, files={self.files}, views={self.views})"
     
+    def serialize(self):
+        post_info = {c.name: str(getattr(self, c.name)) for c in self.__table__.columns}
+        return post_info
+    
 class File(db.Model):
     __tablename__ = "files"
     id = Column(
