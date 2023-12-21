@@ -3,7 +3,7 @@ from flask import Blueprint, render_template, flash, redirect, url_for, request,
 from flask_login import login_user, login_required, logout_user, current_user
 from sqlalchemy.exc import IntegrityError
 
-from my_app import db, rc
+from my_app import db, rc, logger
 from my_app.forms.user import LoginForm, RegistrationForm
 from my_app.models.user import User
 from my_app.models.role import Role
@@ -47,6 +47,15 @@ def login():
                     login_user(user=user)
                     session.permanent = True
                     session.modified = True
+                    logger.info(
+                        msg=f"Login Success : {user.username}",
+                        extra={
+                            "remote_addr": request.remote_addr,
+                            "method": request.method,
+                            "url": request.path,
+                            "version": request.environ.get('SERVER_PROTOCOL')
+                        }
+                    )
                     return redirect(location=url_for(endpoint="board.main"))
                 else:
                     if login_attempts:

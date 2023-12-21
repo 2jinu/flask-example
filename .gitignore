@@ -1,4 +1,5 @@
 flask/source/my_app/static/upload
+log
 mariadb/data/*
 *.pyc
 *.rdb

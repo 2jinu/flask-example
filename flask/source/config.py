@@ -29,6 +29,10 @@ class Config:
     RESTX_VALIDATE = True
     RESTX_MASK_SWAGGER = False
 
+    # Log
+    LOG_DIR = "log"
+    LOG_FILE = "mylog.log"
+
 class ProductionConfig(Config):
     DEBUG = False
 
