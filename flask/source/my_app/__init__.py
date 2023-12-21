@@ -12,12 +12,12 @@ from redis import StrictRedis
 from config import config
 
 def app_logger_test(app:Flask):
-    app.logger.debug(msg="debug log1") # 10
-    app.logger.info(msg="info log1") # 20
-    app.logger.warn(msg="warn log1") # 30
-    app.logger.warning(msg="warning log1") # 30
-    app.logger.error(msg="error log1") # 40
-    app.logger.critical(msg="critical log1") # 50
+    app.logger.debug(msg="debug log1")
+    app.logger.info(msg="info log1")
+    app.logger.warn(msg="warn log1")
+    app.logger.warning(msg="warning log1")
+    app.logger.error(msg="error log1")
+    app.logger.critical(msg="critical log1")
 
     app.logger.setLevel(logging.DEBUG)
     app.logger.debug(msg="debug log2")
